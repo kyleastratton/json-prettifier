@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Prettifier</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 2rem;
+    }
+
+    p {
+      margin-top: 0;
+      color: #cbd5e1;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 420px;
+      resize: vertical;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #3b82f6;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .primary:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #334155;
+      color: white;
+    }
+
+    .secondary:hover {
+      background: #475569;
+    }
+
+    .success {
+      background: #16a34a;
+      color: white;
+    }
+
+    .success:hover {
+      background: #15803d;
+    }
+
+    .status {
+      margin-top: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      min-height: 20px;
+    }
+
+    .error {
+      color: #f87171;
+    }
+
+    .ok {
+      color: #4ade80;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      textarea {
+        min-height: 280px;
+      }
+
+      body {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>JSON Prettifier</h1>
+  <p>Paste your JSON on the left, click prettify, and get clean formatted JSON on the right.</p>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <h3>Input JSON</h3>
+        <textarea id="inputJson" placeholder='Paste JSON here...'></textarea>
+      </div>
+
+      <div>
+        <h3>Prettified Output</h3>
+        <textarea id="outputJson" placeholder='Formatted JSON will appear here...' readonly></textarea>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="primary" onclick="prettifyJSON()">Prettify JSON</button>
+      <button class="secondary" onclick="clearAll()">Clear</button>
+      <button class="success" onclick="copyOutput()">Copy Output</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+</div>
+
+<script>
+  function prettifyJSON() {
+    const input = document.getElementById("inputJson").value.trim();
+    const output = document.getElementById("outputJson");
+    const status = document.getElementById("status");
+
+    status.textContent = "";
+    status.className = "status";
+
+    if (!input) {
+      status.textContent = "Please paste some JSON first.";
+      status.classList.add("error");
+      output.value = "";
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(input);
+      const pretty = JSON.stringify(parsed, null, 2);
+
+      output.value = pretty;
+      status.textContent = "JSON formatted successfully.";
+      status.classList.add("ok");
+    } catch (error) {
+      output.value = "";
+      status.textContent = "Invalid JSON: " + error.message;
+      status.classList.add("error");
+    }
+  }
+
+  function clearAll() {
+    document.getElementById("inputJson").value = "";
+    document.getElementById("outputJson").value = "";
+    document.getElementById("status").textContent = "";
+    document.getElementById("status").className = "status";
+  }
+
+  function copyOutput() {
+    const output = document.getElementById("outputJson");
+    const status = document.getElementById("status");
+
+    if (!output.value.trim()) {
+      status.textContent = "Nothing to copy yet.";
+      status.className = "status error";
+      return;
+    }
+
+    navigator.clipboard.writeText(output.value)
+      .then(() => {
+        status.textContent = "Output copied to clipboard.";
+        status.className = "status ok";
+      })
+      .catch(() => {
+        status.textContent = "Failed to copy output.";
+        status.className = "status error";
+      });
+  }
+</script>
+
+</body>
+</html>
